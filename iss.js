@@ -19,7 +19,6 @@ const fetchMyIP = function (callback) {
 
 const fetchCoordsByIP = (ip, callback) => {
   request(`http://ipwho.is/${ip}`, (error, response, body) => {
-    // console.log(body)
     if (error) {
       return callback('There has been an error getting the coordinates', null);
     };
@@ -30,6 +29,7 @@ const fetchCoordsByIP = (ip, callback) => {
     };
 
     let result = JSON.parse(body);
+    console.log(result)
 
     if (result.success === false) {
       callback(result.message, null)
@@ -42,6 +42,23 @@ const fetchCoordsByIP = (ip, callback) => {
     callback(null, data);
   });
 };
+const fetchISSFlyOverTimes = (coords, callback) => {
+  request(`https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`, (error, response, body) => {
+    if (error) {
+      return callback('There has been an error getting the FlyOverTime', null);
+    };
+    // console.log(response)
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching FlyOverTime. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    };
+      const result = JSON.parse(body)
+      callback(null, result.response)
+
+     });
+};
 
 
-module.exports = { fetchMyIP, fetchCoordsByIP };
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
